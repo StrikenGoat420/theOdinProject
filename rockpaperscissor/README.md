@@ -1,0 +1,1 @@
+A simple rock paper scissor web app where the user plays against the computer. The aim of this project was to learn how to manipulate the DOM using JavaScript. Hence except for the most basic parts, no HTML or CSS codes were written manually and they were instead generated using JavaScript DOM manipulation.
