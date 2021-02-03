@@ -28,8 +28,6 @@ function getRandomRGB(){
     return rgb;
 }
 
-
-//same as changeBackGroundColor = function(item){}
 changeBackGroundColor = (item, hoverMode, color) => {
     /*
     item : the block whose color has to be changed
@@ -46,7 +44,6 @@ changeBackGroundColor = (item, hoverMode, color) => {
         item.addEventListener('mouseover', () => {
             //let currentColor = getComputedStyle(item).getPropertyValue('background-color');
             if (color.toLowerCase() == 'rainbow'){
-                //console.log(hoverMode == true);
                 item.style.backgroundColor = getRandomRGB();
             }
             if (color.toLowerCase() == 'black'){
@@ -63,7 +60,6 @@ changeBackGroundColor = (item, hoverMode, color) => {
         item.addEventListener('mouseover', () => {
             //let currentColor = getComputedStyle(item).getPropertyValue('background-color');
             if (color.toLowerCase() == 'rainbow'){
-                //console.log(hoverMode == true);
                 item.style.backgroundColor = getRandomRGB();
             }
             if (color.toLowerCase() == 'black'){
