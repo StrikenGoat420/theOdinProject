@@ -47,7 +47,10 @@ changeBackGroundColor = (item, hoverMode, color) => {
                 item.style.backgroundColor = getRandomRGB();
             }
             if (color.toLowerCase() == 'black'){
-                item.style.backgroundColor = 'black';
+                let currentColor = getComputedStyle(item).getPropertyValue('background-color');
+                console.log(currentColor)
+                item.style.backgroundColor = 'rgb(0 , 0, 0, 0.1)';
+                console.log("new line")
             }
             if (color.toLowerCase() == 'eraser'){
                 item.style.backgroundColor = 'white';
@@ -64,6 +67,7 @@ changeBackGroundColor = (item, hoverMode, color) => {
             }
             if (color.toLowerCase() == 'black'){
                 item.style.backgroundColor = 'black';
+                item.style.opacity = '0.1';
             }
             if (color.toLowerCase() == 'eraser'){
                 item.style.backgroundColor = 'white';
@@ -129,6 +133,7 @@ colorChangeListener = button => {
     else if (button.id == 'B6'){
         button.addEventListener('click', () => {
             COLOR = 'black';
+            //console.log("Pressed B6")
             box = container.querySelectorAll('.blocks');
             //box.forEach(changeBackGroundColor);
             for (block of box){
@@ -186,3 +191,5 @@ allColorButtons.forEach(colorChangeListener)
 
 
 let n = 1 //for debugging purposes only
+let a = 'testString';
+console.log(a.slice(0, 4))
