@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Calculator</title>
+</head>
+<link rel="stylesheet" href="style.css">
+<body>
+  <div class = 'navBar'>
+    <h1 class='title'>Calculator</h1>
+  </div>
+  <div class = 'container-wrapper'>
+      <div class = 'container'>
+          <div class = 'display'></div>
+          <div class ='sideOperator'>C</div>
+          <div class ='sideOperator'>AC</div>
+          <div class ='sideOperator'>+</div>
+          <div class ='sideOperator'>-</div>
+          <div class ='sideOperator'>x</div>
+          <div class ='sideOperator'>/</div>
+          <div class ='footer'>=</div>
+          <div class ='mainNumber'>7</div>
+          <div class ='mainNumber'>8</div>
+          <div class ='mainNumber'>9</div>
+          <div class ='mainNumber'>4</div>
+          <div class ='mainNumber'>5</div>
+          <div class ='mainNumber'>6</div>
+          <div class ='mainNumber'>3</div>
+          <div class ='mainNumber'>2</div>
+          <div class ='mainNumber'>1</div>
+          <div class ='footer'>0</div>
+          <div class ='footer'>+/-</div>
+          <div class ='footer'>.</div>
+      </div>
+  </div>
+  <script src="js/script.js"></script> 
+</body>
+
+</html>
+
+html {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+ }
+
+ body {
+    margin: 0px;
+    min-height: 100%;
+    width: 100%;
+    background-color : #ededed;
+ }
+
+.navBar {
+    text-align: center;
+    margin-top:10px;
+}
+
+ .title {
+     text-align: center;
+     color: #000;
+     display:inline-block;
+     margin: 10px 43.2%;   
+     position:relative;
+ }
+
+ /*
+ margin 0px auto tells the browser that the top and 
+ bottom margin will be 0px and the left and the right 
+ margin will be set automatically such that the object 
+ is center aligned
+ */
+ .container-wrapper {
+    height: 50em;
+    width: 40em;
+    margin: 0px auto;
+    position: relative;
+}
+
+/*grid-column-gap: 50px; for setting gap between cols */
+.container {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: white;
+    grid-template-columns : repeat(5, 20%) ;
+    grid-template-rows: repeat(5, 20%); 
+    grid-template-areas: 
+        'disp       disp       disp       disp         disp'
+        'mainNumber mainNumber mainNumber sideOperator sideOperator'
+        'mainNumber mainNumber mainNumber sideOperator sideOperator'
+        'mainNumber mainNumber mainNumber sideOperator sideOperator'
+        'footer     footer     footer     footer       footer'
+    ;
+}
+
+.display{
+    grid-area: disp;
+}
+
+.main-number{
+    grid-area: mainNumber;
+}
+
+.side-operation{
+    grid-area: sideOperator;
+}
+
+.footer{
+    grid-area : footer;
+}
+

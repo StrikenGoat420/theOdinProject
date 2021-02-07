@@ -1,0 +1,151 @@
+html {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+ }
+
+ body {
+    margin: 0px;
+    min-height: 100%;
+    width: 100%;
+    background-color : black;
+ }
+
+.navBar {
+    text-align: center;
+    margin-top:10px;
+}
+
+ .title {
+     text-align: center;
+     color: ghostwhite;
+     display:inline-block;
+     margin: 10px 43.2%;   
+     position:relative;
+ }
+
+ /*
+ margin 0px auto tells the browser that the top and 
+ bottom margin will be 0px and the left and the right 
+ margin will be set automatically such that the object 
+ is center aligned
+ */
+ .container-wrapper {
+    height: 45em;
+    width: 35em;
+    margin: 0px auto;
+    position: relative;
+}
+
+/*grid-column-gap: 50px; for setting gap between cols */
+.container {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: white;
+    grid-template-columns : repeat(5, 20%) ;
+    grid-template-rows: repeat(6, 16.66%);
+    grid-template-rows: 20% 10% repeat(4,17.5%) ; 
+    grid-template-areas: 
+        'disp       disp       disp       disp         disp'
+        'brandName  brandName  brandName  brandName    brandName'
+        'number     number     number     operator     operator'
+        'number     number     number     operator     operator'
+        'number     number     number     operator     operator'
+        'footer     footer     footer     operator     operator'
+    ;
+    border: 3px solid;
+    border-color: ghostwhite;
+}
+
+.brandName{
+    grid-area: brandName;
+    text-align: center;
+    border: 3px solid;
+    font-size: 25px;
+    padding-top: 17px;
+    border-color: ghostwhite;
+    background-color: black;
+    color: white;
+    border-bottom: 0px;
+}
+#m1{
+    grid-area: simple;
+}
+
+#m2{
+    grid-area: bodmas;
+}
+
+.output{
+    grid-area: disp;
+    border: 3px solid;
+    background-color: rgb(136, 169, 0);
+    border-color: ghostwhite;
+}
+
+/*
+.expression , .result{
+    background-color: inherit;
+    height: 50%;
+    word-wrap: break-word
+}
+*/
+.result{
+    background-color: inherit;
+    height: 50%;
+    width: 100%;
+    word-wrap: break-word;
+    text-align: right;
+    font-size: 30px;
+
+}
+.expression{
+    height: 50%;
+    width: 50%;
+    font-size: 30px;
+}
+.number{
+    grid-area: number;
+}
+
+.operator{
+    grid-area: operator;
+}
+
+.footer{
+    grid-area: footer;
+}
+
+.button{
+    border: 3px solid;
+    border-color: ghostwhite;
+    background-color: black;
+    color: ghostwhite;
+    font-size: xx-large;
+}
+
+#n0{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 6;
+    grid-row-end: 7;
+}
+ #o8{
+     grid-column-start:1;
+     grid-column-end:2;
+     grid-row-start:6;
+     grid-row-end:7;
+ }
+ #o9{
+    grid-column-start:3;
+    grid-column-end:4;
+    grid-row-start:6;
+    grid-row-end:7;
+}
+
+#o7{
+    grid-area: 6/4/7/6;
+    /* same as xStart/yStart/xEnd/yEnd */
+}
