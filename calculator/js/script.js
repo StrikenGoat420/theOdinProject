@@ -8,6 +8,10 @@ TODO: Add text wrap for both height and width (DONE expression limit is set at 2
       so that while the equalsTo button OR an operator button is not pressed the operation should not be done. (DONE)
 
       Allow user to input number using keyboard (DONE)
+
+      Right now sign change works by changing the sign of the result, make it so that it changes the sign of the next number to be added
+      Add keyboard functionality for sign change as well, that when the screen is blank and the user presses the '-' button then the number
+      input will be taken as a negative
 */
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -108,7 +112,7 @@ displayFunc = function(button){
 
         if ((buttonClass.includes('number') && button.id != 'o7') || button.id == 'o9'){
             //if button pressed is number and not the C button OR if button pressed is the decimal button
-            console.log(num1, num2);
+            //console.log(num1, num2);
 
             if(button.id != 'o9'){
                 //if button pressed is not decimal
@@ -140,7 +144,7 @@ displayFunc = function(button){
         if (buttonClass.includes('operator')){
             let lastChar = EXPRESSION[EXPRESSION.length - 1];
             let prevNum2 = num2;
-            console.log(num1, num2);
+            //console.log(num1, num2);
             //for when user presses C and wants to clear the sign as well
             //if user presses two operations at once, the previous one will be replaced
             if ((lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/') && button.id !='o1'){
@@ -226,6 +230,9 @@ function addKeyboardClicks(){
         }
         else if (event.key == 'Escape'){
             document.getElementById('o2').click();
+        }
+        else if (event.key == '.'){
+            document.getElementById('o9').click();
         }
     });
 }
