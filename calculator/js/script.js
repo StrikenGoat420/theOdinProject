@@ -6,6 +6,8 @@ TODO: Add text wrap for both height and width (DONE expression limit is set at 2
 
       Currently only supports single digit operations, cuz the moment it is getting num2, the operation is being done. We have to do it
       so that while the equalsTo button OR an operator button is not pressed the operation should not be done. (DONE)
+
+      Allow user to input number using keyboard (DONE)
 */
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -193,6 +195,41 @@ displayFunc = function(button){
     })
 };
 
+function addKeyboardClicks(){
+    document.addEventListener('keydown', function(event) {
+        console.log(event.key);
+        for (let i = 0; i<10; i++){
+            //this for loop will simulate a button click for all numbers
+            if (event.key == i){
+                let numberID = 'n'+i;
+                document.getElementById(numberID).click();
+            }
+        }
+
+        if (event.key == 'Enter'){
+            document.getElementById('o7').click();
+        }
+        else if (event.key == '+'){
+            document.getElementById('o3').click();
+        }
+        else if (event.key == '-'){
+            document.getElementById('o4').click();
+        }
+        else if (event.key == '*'){
+            document.getElementById('o5').click();
+        }
+        else if (event.key == '/'){
+            document.getElementById('o6').click();
+        }
+        else if (event.key == 'Backspace'){
+            document.getElementById('o1').click()
+        }
+        else if (event.key == 'Escape'){
+            document.getElementById('o2').click();
+        }
+    });
+}
+
 var EXPRESSION = '';
 var num1 = '';
 var num2 = '';
@@ -202,3 +239,4 @@ setDefaultStyle()
 
 const disButtons = document.querySelectorAll(".display"); //these are all the buttons which will can be in the expression
 disButtons.forEach(displayFunc);
+addKeyboardClicks();
