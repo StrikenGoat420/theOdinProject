@@ -1,11 +1,11 @@
 /*
-TODO: Add text wrap for both height and width
-      Limit number of decimal place so that text doesnt overflow
-      Let user change sign accordingly (DONE!)
-      Implement C and AC (in C only num2 will be blank again, in AC both num1 and num2 will be blank)
+TODO: Add text wrap for both height and width (DONE expression limit is set at 25 chars)
+      Limit number of decimal place so that text doesnt overflow (DONE)
+      Let user change sign accordingly (DONE)
+      Implement C and AC (in C only num2 will be blank again, in AC both num1 and num2 will be blank) (DONE)
 
       Currently only supports single digit operations, cuz the moment it is getting num2, the operation is being done. We have to do it
-      so that while the equalsTo button OR an operator button is not pressed the operation should not be done.
+      so that while the equalsTo button OR an operator button is not pressed the operation should not be done. (DONE)
 */
 
 const formatter = new Intl.NumberFormat('en-US', {
