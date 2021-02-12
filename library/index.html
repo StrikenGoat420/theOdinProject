@@ -6,8 +6,115 @@
 </head>
 <link rel="stylesheet" href="style.css">
 <body>
+  <div class = 'sideBar'>
+    <div class = 'statsContainer'>
+      
+      <h2 class = 'label'>Stats</h2>
+
+      <div class = 'totalBooks'>
+        <h3 class = 'countLabel'>Total : </h3>
+        <span class = 'totalCount'>2</span>
+      </div>
+
+      <div class = 'totalRead'>
+        <h3 class = 'countLabel'>Read : </h3>
+        <span class = 'totalRead'>1</span>
+      </div>
+
+      <div class = 'totalUnread'>
+        <h3 class = 'countLabel'>Unread : </h3>
+        <span class = 'totalunread'>1</span>
+      </div>
+
+    </div>
+
+    <div class = 'saveOptions'>
+
+      <div class = 'saveLocal'>
+        <button class = 'saveButton'>Save Local</button>
+      </div>
+
+      <div class = 'saveOnline'>
+        <button class = 'saveButton'>Save Online</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class = 'shelfContainer'>
+    <div class = 'navigationContainer'>
+
+      <div class = 'userNameContainer'>
+        <h2 class = 'userName'>
+          Users Library
+        </h2>
+      </div>
+
+      <div class = 'addAndFilterContainer'>
+        <div class = 'addBooksContainer centerButton'>
+          <button class = 'addBooksButton'>
+            Click Here To Add A Book
+          </button>
+        </div>
+
+        <div class = 'dateFilterContainer centerButton'>
+          <button class = 'filterButton' id = 'byDate'>
+            Filter By Date
+          </button>
+        </div>
+
+        <div class = 'pageFilterContainer centerButton'>
+          <button class = 'filterButton' id = 'byPage'>
+            Filter by Number of Pages
+          </button>
+        </div>
+
+        <div class = 'nameFilterConter centerButton'>
+          <button class = 'filterButton' id = 'byName'>
+            Filter Alphabetically
+          </button>
+        </div>
+        
+      </div>
+      
+    </div>
+
+    <div class = 'shelf'>
+      <div>
+        <img src = 'test.jpeg'>
+      </div>  
+      
+      <div class = 'centerButton'>
+        <button class = 'addBooksButton'>
+          Add Book
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class = 'popupContainer popup'>
+    <h2 class="formTitle">Book Info</h2>
+    <form class = 'bookInfoForm'>
+      <input class = 'popupInput' id = 'bookName' type = 'text' placeholder = 'Title' required = ''>
+      <input class = 'popupInput' id = 'authorName' type = 'text' placeholder = 'Author' required = ''>
+      <input class = 'popupInput' id = 'pageNumber' type = 'number' placeholder = 'Pages' required = ''>
+      <div class = 'isReadButton'>
+        <label for="isRead" style="margin-right:20px; font-size;font-size: 20px;font-style: normal;">Read?</label>
+        <input id = 'isRead' class = 'popupCheckBox' type = 'checkbox'>
+      </div>
+      <button id = 'submitButton' type = 'submit'>Submit</button>
+    </form>
+  </div>
+
+  <div class="overlay js-overlay"></div>
+
+  
   <script src="js/script.js"></script> 
 </body>
 
 </html>
+
+
+
 
