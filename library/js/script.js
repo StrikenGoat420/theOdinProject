@@ -2,11 +2,30 @@
 Things done so far :
     Input is taken from form already, and new book is added to the library
     Add and Remove from library is done
-
-TODO:
     When user clicks on the book, show pop up screen with all the info about the book and let user change read status
 
+TODO:
+
     Add sorting functionality
+        filter by date is just filter by id, so if user clicks on it we just have to reverse the order of all the divs in the shelf {
+            can just delete all the elemnts, and then create divs starting from shelf[-1] position
+
+            instead try to find a method which will reverse the order of all the divs inside an element 
+            ie. avoid any use of the 'backend'
+        }
+
+        filter by pages possible sol => {
+            store number of pages in an seperate array in the library, when a book is deleted, delete the element at the bookId's position from that array
+            keep track of all position change when we sort that array (ie. 5th element becomes the 1st element and so on).
+
+            Delete all the divs which show the book.
+
+            Create new divs for each element using the sorted array with the id of the element being that elements previous position in the pages array
+        }
+        
+        filter alphabetically {
+            same as filter by pages
+        }
 
     Improve design of the SideBar
 
@@ -91,6 +110,25 @@ function showForm(addButton){
 function closePopup() {
     popup.classList.remove("popupContainerActivated");
     overlay.classList.remove("overlay--active");
+    bookInfoContainer.classList.remove("bookInfoContainerActivated");
+    bookInfoContainer.removeAttribute('id'); //have to do this, so that when the user clicks on a different book, id of that book can
+                                             //be the id the div
+}
+
+function showBookInfo(book){
+    book.addEventListener('click', () => {
+        let bookId = book.parentNode.id.substring(1,);
+        let bookInfoObject = library.showBookDetails(bookId);
+        document.querySelector('.bookName').textContent = bookInfoObject['name'];
+        document.querySelector('.insertAuthorName').textContent = bookInfoObject['author'];
+        document.querySelector('.insertPageNumber').textContent = bookInfoObject['page'];
+        document.querySelector('.insertReadStatus').textContent = bookInfoObject['read'];
+
+        bookInfoContainer.id = 'r'+bookId; //this changes the id of the container to be the same as that of the book
+                                           //whose read status we might change
+        bookInfoContainer.classList.add('bookInfoContainerActivated');
+        overlay.classList.add("overlay--active");
+    })
 }
 
 function getBookContainer(id, name){
@@ -123,6 +161,11 @@ function getBookContainer(id, name){
     book.innerText = name;
     
     bookContainer.appendChild(book);
+
+    //we need to let the user be able to click on the book and be able to see the book info
+    showBookInfo(book);//this func is down here, cuz we use the book.parentNode to get its id, so if the func came before 'book' wouldnt
+                       //have a parent node
+
     return bookContainer;
 }
 
@@ -185,6 +228,8 @@ function deleteBook(button){
     })
 }
 
+
+//this whole function will have to be deleted
 function showBookProp(button){
     button.addEventListener('hover',() => {
         //do something, see if we can get the pressing effect
@@ -238,25 +283,38 @@ function addButtonFunctionality(){
     */
 
     deleteButton.forEach(deleteBook) //this is just as to showcase an example, can remove if we remove all the pre inserted books
-    bookDivs.forEach(showBookProp);
+    //bookDivs.forEach(showBookProp);
+
+    //this button is only for when user is viewing the book info and wants to exit from that view
+    let closeContainerButton = document.querySelector('.closeContainerButton');
+    closeContainerButton.addEventListener("click", closePopup);
+    
+    let changeReadStatusButton = document.querySelector('.changeReadStatusButton');
+    changeReadStatusButton.addEventListener('click', () => {
+        let bookReadId = bookInfoContainer.id.substring(1,)
+        library.shelf[bookReadId].read = !library.shelf[bookReadId].read;
+        document.querySelector('.insertReadStatus').textContent = library.shelf[bookReadId].read;
+    })
 }
 
 const library = new Library();
-library.addBook(1,2,3,true);
-library.addBook(4,5,6,true);
-library.addBook(7,8,9,true);
-library.addBook(10,11,12,false);
-library.addBook(13,14,15,false);
+library.addBook('Book 1',2,3,true);
+library.addBook('Book 2',5,6,true);
+library.addBook('Book 3',8,9,true);
+
 
 const bookShelf = document.querySelector('.shelf')
 const addButtons = document.querySelectorAll('.addBooksButton');
 const popup = document.querySelector('.popupContainer');
+const bookInfoContainer = document.querySelector('.bookInfoContainer')
 const overlay = document.querySelector(".js-overlay");
 const form = document.querySelector(".bookInfoForm");
 const formSubmitButton = document.querySelector('#submitButton');
 
 const deleteButton = document.querySelectorAll('.deleteBookButton');
-const bookDivs = document.querySelectorAll('.book')
+const bookDivs = document.querySelectorAll('.book');
+
+bookDivs.forEach(showBookInfo);
 
 
 //console.log(delButton.parentNode.parentNode.id) //could have used this to get id of book, but instead will just assign each del its own id

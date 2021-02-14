@@ -111,26 +111,6 @@
         </div>
       </div> 
 
-      <div class = 'bookContainer' id = 'b3'>
-        <div class = 'deleteBookContainer'>
-          <h3 class = 'showBookInfo'>Click Book for Info</h3>
-          <button class = 'deleteBookButton' id = 'd3' type = 'close'>Del</button>
-        </div>
-        <div class = 'book'>
-          Book 4
-        </div>
-      </div> 
-
-      <div class = 'bookContainer' id = 'b4'>
-        <div class = 'deleteBookContainer'>
-          <h3 class = 'showBookInfo'>Click Book for Info</h3>
-          <button class = 'deleteBookButton' id = 'd4' type = 'close'>Del</button>
-        </div>
-        <div class = 'book'>
-          Book 5
-        </div>
-      </div> 
-
       <div class = 'addNewBookContainer'>
         <button class = 'addBooksButton'>
           Add Book
@@ -152,6 +132,32 @@
       </div>
       <button id = 'submitButton' type = 'submit'>Submit</button>
     </form>
+  </div>
+
+  <div class = 'bookInfoContainer'>
+    <h2 class = 'bookName'>Some Name</h2>
+    <div class = 'bookInfo'>
+      <div class = 'author bookInfoElement'>
+        Author : <span class = 'insertAuthorName'>Mike Tyson</span>
+      </div>
+      <div class = 'pages bookInfoElement'>
+        Pages : <span class = 'insertPageNumber'>100</span>
+      </div>
+      <div class = 'readStatus bookInfoElement'>
+        Book Read :
+        <span class = 'insertReadStatus'>
+          True
+        </span>
+        <div class = 'changeReadStatus bookInfoElement'>
+          <button class = 'changeReadStatusButton'>
+            Change Read Status
+          </button>
+        </div>
+      </div>
+      <div class = 'closeBookInfoContainer bookInfoElement'>
+        <button class = 'closeContainerButton'>Close</button>
+      </div>
+    </div>
   </div>
 
   <div class="overlay js-overlay"></div>
