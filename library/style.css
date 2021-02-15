@@ -37,6 +37,7 @@ html {
 
 .label{
    margin : 0;
+   text-align : center;
 }
 
 .saveButton{
@@ -72,6 +73,8 @@ img{
    display: grid;
    grid-template-columns: repeat(4, 25%); 
    grid-template-rows: 100%;
+   margin-left: 10%;
+   margin-top: 2%;
 }
 
 .popupContainer{
@@ -240,4 +243,10 @@ img{
 .insertAuthorName, .insertPageNumber, .insertReadStatus{
    font-size: 20px;
    font-weight: normal;
+}
+
+.statsHeader{
+   display: flex;
+   justify-content: space-between;
+   margin: 10%;
 }

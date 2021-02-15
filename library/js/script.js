@@ -3,30 +3,9 @@ Things done so far :
     Input is taken from form already, and new book is added to the library
     Add and Remove from library is done
     When user clicks on the book, show pop up screen with all the info about the book and let user change read status
+    Added sorting functionality
 
 TODO:
-
-    Add sorting functionality
-        filter by date is just filter by id, so if user clicks on it we just have to reverse the order of all the divs in the shelf {
-            can just delete all the elemnts, and then create divs starting from shelf[-1] position
-
-            instead try to find a method which will reverse the order of all the divs inside an element 
-            ie. avoid any use of the 'backend'
-        }
-
-        filter by pages possible sol => {
-            store number of pages in an seperate array in the library, when a book is deleted, delete the element at the bookId's position from that array
-            keep track of all position change when we sort that array (ie. 5th element becomes the 1st element and so on).
-
-            Delete all the divs which show the book.
-
-            Create new divs for each element using the sorted array with the id of the element being that elements previous position in the pages array
-        }
-        
-        filter alphabetically {
-            same as filter by pages
-        }
-
     Improve design of the SideBar
 
     Implement save to cloud or save to local or dummy(if neither options are selected)
@@ -41,15 +20,21 @@ class Book {
         this.pages = pages;
         this.read = read;
     }
-}
-
-class Library {
+  }
+  
+  class Library {
     constructor(){
         this.shelf = [];
+        this.countSortedShelf = [];
+        this.nameSortedShelf = [];
         this.bookCount = this.shelf.length;
         this.id = 0;
-    }
+        this.reverse = false;//used for sorting by date
+        this.nameReverse = false;//used for sorting by name
+        this.pageReverse = false;//used for sorting by page
 
+    }
+  
     addBook (name, author, pages, read) {
         // console.log(this.bookCount);
         let book = new Book(this.id, name, author, pages, read);
@@ -57,9 +42,74 @@ class Library {
         this.shelf.push(book);
         this.bookCount = this.shelf.length; //need to update book count after 
         // console.log(this.bookCount);
-        this.id += 1;      
+        this.id += 1; 
+        this.setSortedShelf(book);     
     }
+  
+    setSortedShelf(book){
+        //the or condition is redundant, cuz both the shelfs will be updated at the same time
+        if (this.countSortedShelf.length == 0 || this.nameSortedShelf.length == 0){
+            this.countSortedShelf.push(book);
+            this.nameSortedShelf.push(book);
+            //console.log(JSON.parse(JSON.stringify(this.nameSortedShelf)))
+            return
+        }   
+        // console.log(`before book name = ${book.name}`)
+        // console.log(JSON.parse(JSON.stringify(this.countSortedShelf)))
+        let countIndex = this.getElIndex(this.countSortedShelf, book, 0, this.countSortedShelf.length, 0);
+        let nameIndex = this.getElIndex (this.nameSortedShelf, book, 0, this.nameSortedShelf.length, 1);
+        
+        //console.log(`index for ${book.name} = ${countIndex+1} ${this.countSortedShelf[0].pages} ${book.pages}`);
+        //this if and else is neccesary, dont know why
+        if (countIndex == 0 && this.countSortedShelf[0].pages > book.pages){
+            this.countSortedShelf.splice(countIndex, 0, book);
+        }
+        else {
+            this.countSortedShelf.splice(countIndex+1, 0, book);
+        }
 
+        if (nameIndex == 0 && this.nameSortedShelf[0].name > book.name){
+            this.nameSortedShelf.splice(nameIndex, 0, book);        
+        }
+        else {
+            this.nameSortedShelf.splice(nameIndex+1, 0, book);
+        }      
+        
+        // console.log(`after book name = ${book.name}`);
+        // console.log(JSON.parse(JSON.stringify(this.countSortedShelf)));
+        return
+        
+    }
+  
+    getElIndex (a, book, start, end, mode){
+        //function to give index of where to put the new item in an already sorted list
+        //mode == 0 means we are sorting by count
+        //mode == 1 means we are sorting name
+        let i = Math.floor(start+(end-start)/2);
+        let iEl = 0;
+        let bEl = 0;
+        //console.log(a, i)
+        if (mode == 0){
+            iEl = a[i].pages;
+            bEl = book.pages;
+        }
+        else if (mode == 1){
+            iEl = a[i].name;
+            bEl = book.name;
+        }
+        //console.log(iEl, bEl);
+  
+        if (end-start <= 1|| iEl == bEl){
+            return i;
+        }
+        else if (iEl > bEl){
+            return this.getElIndex(a, book, start, i, mode);
+        }
+        else if (iEl < bEl){
+            return this.getElIndex(a, book, i, end, mode);
+        }
+    }
+  
     removeBook(idNum){
         if (idNum > this.id){
             console.log("Element doesnt exist in Library");
@@ -73,11 +123,27 @@ class Library {
         }
         //updating id, so that we do not end up skipping an id
         this.id -= 1;
+  
+        //deleting book from the sortedCount and sortedName shelf
+        let countDeleteId = 0;
+        let nameDeleteId = 0;
+        //getting index of element to be deleted in each shelf
+        for (let i = 0; i<this.countSortedShelf.length; i++){
+            if (this.countSortedShelf[i].id == idNum){
+                countDeleteId = i;
+            }
+            if (this.nameSortedShelf[i].id == idNum){
+                nameDeleteId = i;
+            }
+        }
+  
+        this.countSortedShelf.splice(countDeleteId, 1);
+        this.nameSortedShelf.splice(nameDeleteId, 1);
     }
-
+  
     showBookDetails (idNum) {
         //func takes in an id number and returns and array of the book details
-
+  
         //todo : find better way to loop over all properties of the book class
         let bookTBDisplay = this.shelf[idNum];
         let bookDetails = {
@@ -88,17 +154,62 @@ class Library {
         }
         return bookDetails;
     }
-
+  
     getShelf(){
         return this.shelf;
     }
-
+  
     getLastBook (){
         //function that returns that last book in the shelf
         //since id is created in the library class, to get access to the id we need this to get the id of the last added book
         return this.shelf[this.shelf.length - 1];
     }
-}
+  
+    reverseShelf(mode){
+        //mode 0 = sort by date
+        //mode 1 = sort by name
+        //mode 2 = sort by pages
+        if (mode == 0){
+            if (this.reverse == false){
+                let reversedShelf = []
+                for (let i = this.shelf.length-1; i>-1; i--){
+                    reversedShelf.push(this.shelf[i]);
+                }
+                this.reverse = !this.reverse;
+                return reversedShelf;
+            }
+            this.reverse = !this.reverse;
+            return this.shelf;
+        }
+
+        if (mode == 1){
+            if (this.nameReverse == false){
+                let reversedShelf = []
+                for (let i = this.nameSortedShelf.length-1; i>-1; i--){
+                    reversedShelf.push(this.nameSortedShelf[i]);
+                }
+                this.nameReverse = !this.nameReverse;
+                return reversedShelf;
+            }
+            this.nameReverse = !this.nameReverse;
+            return this.nameSortedShelf;
+        }
+
+        if (mode == 2){
+            if (this.pageReverse == false){
+                let reversedShelf = []
+                for (let i = this.countSortedShelf.length-1; i>-1; i--){
+                    reversedShelf.push(this.countSortedShelf[i]);
+                }
+                this.pageReverse = !this.pageReverse;
+                return reversedShelf;
+            }
+            this.pageReverse = !this.pageReverse;
+            return this.countSortedShelf;
+        }
+    }
+
+  }
 function showForm(addButton){
     addButton.addEventListener('click', () => {
         form.reset();
@@ -228,39 +339,37 @@ function deleteBook(button){
     })
 }
 
+function assignSortButtonFunctionality(filterButton){
+    filterButton.addEventListener('click', () => {
+        let bookContainer = document.querySelectorAll('.bookContainer');
+        bookContainer.forEach(e => e.parentNode.removeChild(e));
+        let addBookContainer = document.querySelector('.addNewBookContainer');
 
-//this whole function will have to be deleted
-function showBookProp(button){
-    button.addEventListener('hover',() => {
-        //do something, see if we can get the pressing effect
-        let aaaaaaaaaa = 11;
-    })
-    button.addEventListener('click', () => {
-        let bookId = button.parentNode.id;
-        bookId = Number(bookId.substring(1,));
-        let bookInfo = library.showBookDetails(bookId)
-        console.log(bookInfo);
-        /*
-            Continue from here
-            We have the book info now of the given ID. Use it show 
-            the book details in the popup
+        if (filterButton.id == 'byDate'){
+            let reverseShelf = library.reverseShelf(0);
+            for (let i = 0; i<reverseShelf.length; i++){
+                bookContainer = getBookContainer(reverseShelf[i].id, reverseShelf[i].name)
+                bookShelf.insertBefore(bookContainer, addBookContainer);
+            }
+        }
+        else if (filterButton.id == 'byPage'){
+            let countSortedShelf = library.reverseShelf(2);
+            for (let i = 0; i<countSortedShelf.length; i++){
+                bookContainer = getBookContainer(countSortedShelf[i].id, countSortedShelf[i].name)
+                bookShelf.insertBefore(bookContainer, addBookContainer);
+            }
 
-            Do similarly to how we did the popup form
-                -> write html and css for the pop up and before and after class
-                -> fill details in it using the bookInfo we have
-                -> for Read do something like (design):
-                    Read : true  changeStatus
-
-                    where changeStatus is the button which will change the status of the read field
-                    if button is pressed {
-                        library.shelf[i].read = !library.shelf[i].read
-                    }
-                    essentially read = !read  
-
-        */
-
+        }
+        else if (filterButton.id == 'byName'){
+            let nameSortedShelf = library.reverseShelf(1);
+            for (let i = 0; i<nameSortedShelf.length; i++){
+                bookContainer = getBookContainer(nameSortedShelf[i].id, nameSortedShelf[i].name)
+                bookShelf.insertBefore(bookContainer, addBookContainer);
+            }
+        }
     })
 }
+
 
 function addButtonFunctionality(){
     addButtons.forEach(showForm); //clicking on these buttons will show the form
@@ -283,7 +392,6 @@ function addButtonFunctionality(){
     */
 
     deleteButton.forEach(deleteBook) //this is just as to showcase an example, can remove if we remove all the pre inserted books
-    //bookDivs.forEach(showBookProp);
 
     //this button is only for when user is viewing the book info and wants to exit from that view
     let closeContainerButton = document.querySelector('.closeContainerButton');
@@ -295,12 +403,19 @@ function addButtonFunctionality(){
         library.shelf[bookReadId].read = !library.shelf[bookReadId].read;
         document.querySelector('.insertReadStatus').textContent = library.shelf[bookReadId].read;
     })
+
+    let filterButtons = document.querySelectorAll('.filterButton')
+    filterButtons.forEach(assignSortButtonFunctionality);
 }
 
+
 const library = new Library();
-library.addBook('Book 1',2,3,true);
-library.addBook('Book 2',5,6,true);
-library.addBook('Book 3',8,9,true);
+// library.addBook('Book 2',2,80,true);
+// library.addBook('Book 1',8,32,true);
+// library.addBook('Book 0',8,33,true);
+// library.addBook('Book 3',5,96,true);
+// console.log(library.countSortedShelf);
+// console.log(library.nameSortedShelf);
 
 
 const bookShelf = document.querySelector('.shelf')
@@ -316,11 +431,12 @@ const bookDivs = document.querySelectorAll('.book');
 
 bookDivs.forEach(showBookInfo);
 
-
 //console.log(delButton.parentNode.parentNode.id) //could have used this to get id of book, but instead will just assign each del its own id
 
 //bookShelf.removeChild(document.getElementById('b200'))
 addButtonFunctionality();
+
+
 
 
 
