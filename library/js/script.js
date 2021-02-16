@@ -410,10 +410,10 @@ function addButtonFunctionality(){
 
 
 const library = new Library();
-// library.addBook('Book 2',2,80,true);
-// library.addBook('Book 1',8,32,true);
+library.addBook('Book 1',8,32,true);
+library.addBook('Book 2',2,96,true);
 // library.addBook('Book 0',8,33,true);
-// library.addBook('Book 3',5,96,true);
+library.addBook('Book 3',5,80,true);
 // console.log(library.countSortedShelf);
 // console.log(library.nameSortedShelf);
 
