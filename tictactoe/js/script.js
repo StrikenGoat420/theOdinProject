@@ -1,92 +1,265 @@
 const gameBoard = (function () {
-    /*
-    DOM will be manipulated from the gameBoard only 
-    just the things we can do with the board or are related to the board
-    Like : Define the board //2d array
 
-           place(element, position) // where to put what //insert will also manipulate the DOM to check, and insert an element at that position
+    const _getEmptyBoard = function() {
+        let board = [];
+        for(let i = 0; i<3; i++){
+            let row = [null,null,null];
+            board.push(row);
+        }
+        return board;
+    }
 
-           isEmpty (position) // if the place where the user wants to click is empty then only the move is valid //might or might not be a private func
-                              // preferably it should be a private function. Something like if it returns false then the PLACE func also returns false 
-                              // and the user has to choose another option
+    let board = _getEmptyBoard();
 
-           clear //func to clear the board
+    const place = function(element, position){
+        //function takes in the element and the position where the element has to be inserted at.
+        //position is in the form of a string, such as b00, b01 and so on so we have to use substring method.
 
-           checkgameOver //func to check whether the game is over or not, if over whther it is a draw or a win. If a win who won.
-                `        //this func will return the sign of the winner (ie. X won or O won)
-                         //this func has to be in the gameboard itself as we will be defining the board over here, and the board has to be private and unaccesible from outside
-                         //preferably a private func where after every turn (ie. after every PLACE) we check whether the game is over or not, and return a boolean accordingly
-                         //something like returns false when game is not over, so the game can continue and true when it is over
+        //func returns an object containing 3 attributes, draw, win, and legal 
+        let row = Number(position[1]);
+        let col = Number(position[2]);
+        if (_isEmpty(row, col)){
+            let gameStatus = _checkGameOver();
+            Object.assign(gameStatus, {legal : _isEmpty(row,col)});
+            board[row][col] = element;
+            //dom.placeElement(element, position) //TODO in the dom module, where the position is just going to be the id of the block where we will be placing
+                                                  //the element
+            return gameStatus;
+        };
+        let gameStatus = _checkGameOver();
+        Object.assign(gameStatus, {legal : _isEmpty(row,col)});
+        return gameStatus;
+    };
 
-           
-    */
+    const _isEmpty = function(row, col){
+        if (board[row][col] === null){
+            return true;
+        }
+        return false;
+    };
+
+    const _checkGameOver = function(){
+        let win = _checkWin();
+        let draw = _checkDraw();
+        return {
+            win,
+            draw,
+        }
+        //returns Object with 2 attributes win and draw
+    };
+
+    const _checkWin = function(){
+        _checkCols = (function () { //function to check whther the winner is in cols
+            let same = false; //boolean value, which if true means that the winner has won by having 3 consecutives values in a col
+            for (let col = 0; col < board[0].length; col++){ 
+                for(let row = 1; row < board.length; row++){
+                    if(board[row][col] != board[row-1][col]){
+                        same = false;
+                        break;
+                    }
+                    else if (board[row][col] != null){ 
+                        same = true;
+                    }
+                }
+                if (same == true){
+                    return same; 
+                }
+            }
+            return same;
+        });
+    
+        _checkRows = (function () { //function to check whther the winner is in rows
+            let same = false;
+            for (let row = 0; row < board.length; row++){
+                for (let col = 1; col < board[row].length; col++){
+                    if(board[row][col] != board[row][col-1]){
+                        same = false;
+                        break;
+                    }
+                    else if (board[row][col] != null){ //
+                        same = true;
+                    }
+                }
+                if (same == true){
+                    return same;
+                }
+            }
+            return same;
+        });
+
+        _checkDiag = (function () { //function to check whther the winner is in diags
+            let same = false;
+            
+            //checking for right diagolnal //left to right 00,11,22
+            for (let row = 1; row<board.length; row++){
+                if (board[row][row] != board[row-1][row-1] || board[row][row] == null){
+                    same = false;
+                    break;
+                }
+                else if(board[row][row] == board[row-1][row-1]){
+                    same = true;
+                }
+            }
+
+            if (same == true){ //if right diagonal is the winner then no need to check left diagonal
+                return same;
+            };
+            
+            //checking for left diagonal // right to left 02, 11, 20  or 13,22,31
+            //as row increases col = len(col) - row
+            for (let row = 1; row < board.length; row++){
+                let col = board[row].length - row -1;//cuz 0 index and board[row].length will give us 3, but we need 2
+                let prevRow = row-1;
+                let prevCol = board[row].length - prevRow -1
+                if (board[row][col] != board[prevRow][prevCol] || board[row][row] == null){
+                    same = false;
+                    break;
+                }
+                else if (board[row][col] == board[prevRow][prevCol]){
+                    same = true;
+                }
+            }
+            return same; //no need to check for same == true, cuz regardless we have to send the output now
+        });
+        
+        return _checkCols() || _checkRows() || _checkDiag();
+    };
+
+    const _checkDraw = function(){
+        for (let i = 0; i<board.length; i++){
+            for (let j = 0; j<board[i].length; j++){
+                if(_isEmpty(i, j)){
+                    return false; // if even a single block is empty that means the game isn't a draw
+                }
+            }
+        }
+        return true; //if nothing is return in the for loops then that means that all the blocks are full and hence game is a draw
+    }
+
+    const reset = function(){
+        //function to reset the game board, to be used when user clicks on the play again button
+        board = _getEmptyBoard();
+        //dom.resetBoard()//TODO this function
+    }
+
+    const getBoardState = function () {
+        return board;
+    }
+
+
     return {
         place,
-        clear,
-    }
+        reset,
+        getBoardState,
+    };    
 }())
 
-const player = (function (sign) {
-    /*
-    Factory function and not a module hence this will not be executed immediately
-    DOM will not be manipulated from here
-    everything the player can do or related to the player
-    Like : Define a const for the sign
+const player = (function (sign, isHuman) {
+    
+    const insert = function (position) {
+        if (isHuman) {
+            let gameState = gameBoard.place(sign, position);
+            return gameState;
+        }
+        else {
+            //position = AI.getAIPosition()//TODO
+            let gameState = gameBoard.place(sign, position);
+            let aiSelection = document.getElementById(position);
+            aiSelection.innerText = sign;
+            return gameState;
+        }
+    }
 
-           Define an attribute which tells use whether or not the player is a human or not
+    const getSign = function () {
+        return sign;
+    }
 
-           Insert (position) //this function will call the gameBoard.place(element, position) function where the element will be the sign   
-                             //and the position will be the position. The gameBoard.place func will return an object containing 3 boolean values
-                             //win game-over and legal move. In turn this function will return that object into the game function, where depending on the situation
-                             //the correct action will be taken (like if game if won, then what to do or if move is illegal then what to do).
-
-                             //can also do something like if object['win'] === true, then we set the win flag for said player as true and then check the win
-                             //flag at the game function to determine who has won. And this function will return only object['game-over' and 'legal move'] to the gameboard. Can 
-                             //use the object.assign method
-            
-            giveUp // not an essential function, but if the player clicks on give up the game and the series will be over and the final score of which player has won
-                   //more games can be shown
-    */
+    const AI = (function(gameState){
+        //doSomething
+    });
 
     return {
         insert,
-        giveUp,
+        getSign,
+
     }
+    
 })
 
 const game = (function () {
+    let humanPlayer = player('X', true);
+    let aiPlayer = player('O', false);
+    let humanTurn = true; //first chance is humans is human is X
+    //dom.highlightButton('buttonX') //TODO function which highlights the button the user is
+    //console.log('initially ' +humanPlayer.getSign(), aiPlayer.getSign());
+    const choiceButtons = document.querySelectorAll('.choiceButton');
+    choiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.id == 'buttonX'){
+                humanPlayer = player('X', true);
+                aiPlayer = player('O', false);
+                gameBoard.reset(); //reset the board after every change
+                //dom.highlightButton(button.id) //TODO function which highlights the button the user is
+                //dom.removeHighlight('buttonO) //TODO function to remove the highlight from the other button
+            }
+            else if (button.id == 'buttonO'){
+                humanPlayer = player('O', true);
+                aiPlayer = player('X', false);
+                humansTurn = false //first chance is AI'slet humanTurn = true;
+                gameBoard.reset(); //reset the board after every change
+                //dom.highlightButton(button.id) //TODO function which highlights the button the user is
+                //dom.removeHighlight('buttonX) //TODO function to remove the highlight from the other button
+            }
+        })
+    })
+
+    let gameOver = false;
+    let allBlocks = document.querySelectorAll('.button');
     /*
-    Will be a module and hence be executed immediately 
-    Contains everything that can be done in game or is related to the game
-    Like : Define both the players (if user clicks on X then AI is O or if user clicks on O then AI is X)
-           
-           Define some sort of counter or turn based mechanism which will allow for the players to play one after other 
-           //something like a boolean playerOneTurn where if the boolean is true then it is player one's turn else if it player two's turn
+        CAN MAKE IT SUCH THAT EVERYTIME THE HUMAN MAKES A LEGAL MOVE WE LET THE AI MAKE A MOVE AS WELL, THAT WAY WE DO NOT
+        HAVE TO USE A WHILE LOOP OR ANYTHING LIKE THAT
 
-           Define gameOver boolean as well and set it to false. Start a while loop that runs while the boolean is not True
-           //In the While loop after every players turn set the boolean as the same value as object['game-over'] from the object which will
-           //be return after every player inserts his/her value at set position. Before checking for game-over check for player.win after each insert if the insert
-           //is a legal move
+        THIS WILL MAKE THE humanTurn VARIABLE OBSOLETE, WE CAN DO SOMETHING LIKE 
+        allBlocks.forEach(block () => {
+            block.addEvenListener('click', () => {
+                if human clicks on a valid button make appropriate symbol appear
+                THEN let AI make a move
 
-           getPosition() //this function will return the position of where the user has clicked on the grid, which will be an array of size 2 or something like that 
-                         //which will tell us the row and the col in which to insert said element. Can assign each grid block its own unique id, something like 00, 01, 02
-                         //and so on, where the first int is the row and the second int is the col. Can use the split function to seperate the two. This function will only be
-                         //in use if it is the human players turn. So in the while loop when it is the human players turn. So in the while loop check whether the player is a 
-                         //human or not and if the player is a human then before the player.insert function use the getPosition function to find out which position the human
-                         //has clicked.
-            
-            startNewGame() //this function will reset the board and start a new game if the user clicks on the newGame button 
-            
-            add the startNewGame button eventlistner as a normal object only which will call the startNewGame function. 
-            add the select player eventlistener as a normal object as well in which if the player clicks on X, then assign value of X to player and so on
-            most if not all of the eventlisteners will be in this function only, ie game difficulty(when implemented) and player sign and all. The getPosition function
-            will have the eventlistener to check on which 'block' then user has clicked and then to return the id of said block
+                ONLY CHANGE DOM AND LET AI MAKE A MOVE IF gameState['win'] and gameState['draw'] == False AND if gameState['legal'] == True
+            })
+        })
     */
+   allBlocks.forEach(block  => {
+        block.addEventListener('click', () => {
+            let gameState = humanPlayer.insert(block.id);
+            if (gameState['legal'] == true){
+                block.innerText = humanPlayer.getSign();
+                if (gameState['win'] == false && gameState['draw'] == false){
+                    console.log('inside this')
+                    gameState = aiPlayer.insert('b12'); 
+                    /*
+                        CONTINUE FROM HERE
+                        AFTER THE HUMAN HAS MADE A MOVE, WE HAVE STORED THE GAME STATE IN THE gameState VARIABLE
+                        THEN IF THE MOVE IS VALID WE LET THE AI MAKE THE MOVE AND THEN UPDATE THE GAME STATE. CHECK THE
+                        UPDATED GAMESTATE ONCE THE AI HAS MADE THE MOVE TO CHECK WHETHER THE GAME IS OVER OR NOT. IF SO THEN 
+                        DO APPROPRIATE THING AND RESET THE BOARD AFTER SHOWING A PROMPT OR SOMETHING THAT SAYS THE AI WON.
+
+                        DO THE SAME FOR THE HUMAN PLAYER
+                    */
+                }
+            }
+            
+        })
+   })
 }())
 
 const dom = (function() {
     /*
     contains all the functions which will change the dom and the appearance 
     */
-})
+   //setting css property so that only the on the inside of the grid are shown
+   const gameBoard = document.querySelector(".gameBoard");
+   const gameButtons = document.querySelectorAll('.button');
 
+
+}());

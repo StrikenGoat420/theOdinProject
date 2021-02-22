@@ -2,11 +2,68 @@ html {
     margin: 0px;
     height: 100%;
     width: 100%;
+    overflow: hidden;
  }
 
  body {
     margin: 0px;
     min-height: 100%;
     width: 100%;
-    /*background-color : black;*/
+    box-sizing: border-box;
+    background-color : #ededed;
  }
+
+ .title {
+    text-align: center;
+ }
+.gameContainer {
+   margin: 2% auto;
+   width: 50%;
+   height: 20rem;
+}
+ .gameBoard {
+    display: grid;
+    grid-template-columns: repeat(3, 33.33%);
+    grid-template-rows: repeat(3, 33.33%);
+    height: 100%;
+    margin: 4% auto;
+    width: 30%;
+ }
+
+ .gameBoardContainer {
+    height: 50%;
+ }
+
+ .playerSelection {
+    display: flex;
+    justify-content: center;
+ }
+
+ .choiceButton{
+    width: 10em;
+    margin: 0px 1%;
+    cursor: pointer;
+ }
+
+ .button {
+    background-color: inherit;
+    border: 3px solid;
+    cursor: pointer;
+ }
+
+ .noTop {
+    border-top: none;
+ }
+
+ .noBottom {
+   border-bottom: none;
+ }
+
+ .noLeft {
+    border-left: none;
+ }
+
+ .noRight {
+    border-right: none;
+ }
+

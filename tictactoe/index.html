@@ -2,15 +2,35 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Calculator</title>
+  <title>tictactoe</title>
 </head>
 <link rel="stylesheet" href="style.css">
 <body>
   <div class = 'navBar'>
     <h1 class='title'>TicTacToe</h1>
   </div>  
+
+  <div class = 'gameContainer'>
+    <div class = 'playerSelection'>
+      <button class = 'choiceButton' id = 'buttonX'>X</button>
+      <button class = 'choiceButton' id = 'buttonO'>O</button>
+    </div>
+
+    <div class = 'gameBoardContainer'>
+      <div class = 'gameBoard'>
+        <button class = 'button noTop noLeft' id = 'b00'></button>
+        <button class = 'button noTop' id = 'b01'></button>
+        <button class = 'button noTop noRight' id = 'b02'></button>
+        <button class = 'button noLeft' id = 'b10'></button>
+        <button class = 'button' id = 'b11'></button>
+        <button class = 'button noRight' id = 'b12'></button>
+        <button class = 'button noLeft noBottom' id = 'b20'></button>
+        <button class = 'button noBottom' id = 'b21'></button>
+        <button class = 'button noRight noBottom' id = 'b22'></button>
+      </div>
+    </div>
+  </div>
   <script src="js/script.js"></script> 
 </body>
-
 </html>
 
