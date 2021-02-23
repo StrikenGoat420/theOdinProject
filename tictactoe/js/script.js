@@ -1,3 +1,45 @@
+
+/*
+TODO: Implement MINIMAX Algorithm for the AI
+*/
+const DOM = (function() {
+    /*
+    contains all the functions which will change the dom and the appearance 
+    */
+   const resetBoard = (function () {
+       for (let i = 0; i < 3; i++){
+           for (let j = 0; j < 3; j++){
+               let id = 'b'+i+j;
+               let element = document.getElementById(id);
+               element.innerText = '';
+           }
+       }
+   });
+
+   const placeElement = (function(sign, id){
+       let element = document.getElementById(id);
+       element.innerText = sign;
+   });
+
+   const highlightButton = (function (buttonId) {
+       console.log('in here')
+        let button = document.getElementById(buttonId);
+        button.style.border = '3px solid';
+   })
+
+   const removeHighlight = (function (buttonId){
+        let button = document.getElementById(buttonId);
+        button.style.border = 'none';
+   })
+
+   return {
+       resetBoard,
+       placeElement,
+       highlightButton,
+       removeHighlight
+   }
+}());
+
 const gameBoard = (function () {
 
     const _getEmptyBoard = function() {
@@ -18,16 +60,17 @@ const gameBoard = (function () {
         //func returns an object containing 3 attributes, draw, win, and legal 
         let row = Number(position[1]);
         let col = Number(position[2]);
+        //console.log(`row is ${row} and col is ${col} isEmpty check output is ${_isEmpty(row,col)}`);
         if (_isEmpty(row, col)){
-            let gameStatus = _checkGameOver();
-            Object.assign(gameStatus, {legal : _isEmpty(row,col)});
             board[row][col] = element;
-            //dom.placeElement(element, position) //TODO in the dom module, where the position is just going to be the id of the block where we will be placing
+            let gameStatus = _checkGameOver();
+            Object.assign(gameStatus, {legal : true});
+            DOM.placeElement(element, position) //TODO in the dom module, where the position is just going to be the id of the block where we will be placing
                                                   //the element
             return gameStatus;
         };
         let gameStatus = _checkGameOver();
-        Object.assign(gameStatus, {legal : _isEmpty(row,col)});
+        Object.assign(gameStatus, {legal : false});
         return gameStatus;
     };
 
@@ -139,7 +182,8 @@ const gameBoard = (function () {
     const reset = function(){
         //function to reset the game board, to be used when user clicks on the play again button
         board = _getEmptyBoard();
-        //dom.resetBoard()//TODO this function
+        DOM.resetBoard()//TODO this function
+        // for (let i = 0; i)
     }
 
     const getBoardState = function () {
@@ -157,16 +201,27 @@ const gameBoard = (function () {
 const player = (function (sign, isHuman) {
     
     const insert = function (position) {
+        let legal = false;
         if (isHuman) {
             let gameState = gameBoard.place(sign, position);
-            return gameState;
+            legal = gameState['legal'];
+            return gameState;        
         }
         else {
             //position = AI.getAIPosition()//TODO
+            position = AI.genRandomMove();
             let gameState = gameBoard.place(sign, position);
-            let aiSelection = document.getElementById(position);
-            aiSelection.innerText = sign;
-            return gameState;
+            if (gameState['legal'] == true){
+                return gameState;
+            }
+            else {
+                while (gameState['legal'] != true){
+                    position = AI.genRandomMove();
+                    gameState = gameBoard.place(sign, position);
+                    console.log('in while')
+                };
+                return gameState;
+            }
         }
     }
 
@@ -175,8 +230,16 @@ const player = (function (sign, isHuman) {
     }
 
     const AI = (function(gameState){
-        //doSomething
-    });
+       const genRandomMove = function () {
+           let col = Math.floor(Math.random()*3);
+           let row = Math.floor(Math.random()*3);
+           return 'b'+String(row)+String(col);
+       }
+
+       return {
+           genRandomMove,
+       }
+    })();
 
     return {
         insert,
@@ -189,9 +252,7 @@ const player = (function (sign, isHuman) {
 const game = (function () {
     let humanPlayer = player('X', true);
     let aiPlayer = player('O', false);
-    let humanTurn = true; //first chance is humans is human is X
-    //dom.highlightButton('buttonX') //TODO function which highlights the button the user is
-    //console.log('initially ' +humanPlayer.getSign(), aiPlayer.getSign());
+    DOM.highlightButton('buttonX') //function which highlights the button the user is
     const choiceButtons = document.querySelectorAll('.choiceButton');
     choiceButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -199,67 +260,46 @@ const game = (function () {
                 humanPlayer = player('X', true);
                 aiPlayer = player('O', false);
                 gameBoard.reset(); //reset the board after every change
-                //dom.highlightButton(button.id) //TODO function which highlights the button the user is
-                //dom.removeHighlight('buttonO) //TODO function to remove the highlight from the other button
+                DOM.highlightButton(button.id) //TODO function which highlights the button the user is
+                DOM.removeHighlight('buttonO') //TODO function to remove the highlight from the other button
             }
             else if (button.id == 'buttonO'){
                 humanPlayer = player('O', true);
                 aiPlayer = player('X', false);
-                humansTurn = false //first chance is AI'slet humanTurn = true;
                 gameBoard.reset(); //reset the board after every change
-                //dom.highlightButton(button.id) //TODO function which highlights the button the user is
-                //dom.removeHighlight('buttonX) //TODO function to remove the highlight from the other button
+                DOM.highlightButton(button.id) 
+                DOM.removeHighlight('buttonX')
+                aiPlayer.insert(); //first chance is the AI's if AI is X, so inserting AI's choice first
             }
         })
     })
-
-    let gameOver = false;
     let allBlocks = document.querySelectorAll('.button');
-    /*
-        CAN MAKE IT SUCH THAT EVERYTIME THE HUMAN MAKES A LEGAL MOVE WE LET THE AI MAKE A MOVE AS WELL, THAT WAY WE DO NOT
-        HAVE TO USE A WHILE LOOP OR ANYTHING LIKE THAT
-
-        THIS WILL MAKE THE humanTurn VARIABLE OBSOLETE, WE CAN DO SOMETHING LIKE 
-        allBlocks.forEach(block () => {
-            block.addEvenListener('click', () => {
-                if human clicks on a valid button make appropriate symbol appear
-                THEN let AI make a move
-
-                ONLY CHANGE DOM AND LET AI MAKE A MOVE IF gameState['win'] and gameState['draw'] == False AND if gameState['legal'] == True
-            })
-        })
-    */
-   allBlocks.forEach(block  => {
+    allBlocks.forEach(block  => {
         block.addEventListener('click', () => {
             let gameState = humanPlayer.insert(block.id);
-            if (gameState['legal'] == true){
-                block.innerText = humanPlayer.getSign();
-                if (gameState['win'] == false && gameState['draw'] == false){
-                    console.log('inside this')
-                    gameState = aiPlayer.insert('b12'); 
-                    /*
-                        CONTINUE FROM HERE
-                        AFTER THE HUMAN HAS MADE A MOVE, WE HAVE STORED THE GAME STATE IN THE gameState VARIABLE
-                        THEN IF THE MOVE IS VALID WE LET THE AI MAKE THE MOVE AND THEN UPDATE THE GAME STATE. CHECK THE
-                        UPDATED GAMESTATE ONCE THE AI HAS MADE THE MOVE TO CHECK WHETHER THE GAME IS OVER OR NOT. IF SO THEN 
-                        DO APPROPRIATE THING AND RESET THE BOARD AFTER SHOWING A PROMPT OR SOMETHING THAT SAYS THE AI WON.
-
-                        DO THE SAME FOR THE HUMAN PLAYER
-                    */
-                }
+            if (gameState['legal'] == true){ //only let the AI move once the human makes a legal game move
+                let gameOver = checkGameOver('humanPlayer', gameState);
+                if (!gameOver){
+                    gameState = aiPlayer.insert(); 
+                    gameOver = checkGameOver('AI', gameState);
+                };                
             }
             
         })
    })
+
+    const checkGameOver = function (user, gameState){
+        if (gameState['win'] == true){
+            alert(user + ' has won');
+            gameBoard.reset();
+            return true;
+        };
+        if (gameState['draw'] == true){
+            alert('game drawn');
+            gameBoard.reset();
+            return true;
+        };
+        return false;
+   }
 }())
 
-const dom = (function() {
-    /*
-    contains all the functions which will change the dom and the appearance 
-    */
-   //setting css property so that only the on the inside of the grid are shown
-   const gameBoard = document.querySelector(".gameBoard");
-   const gameButtons = document.querySelectorAll('.button');
-
-
-}());
