@@ -22,7 +22,6 @@ const DOM = (function() {
    });
 
    const highlightButton = (function (buttonId) {
-       console.log('in here')
         let button = document.getElementById(buttonId);
         button.style.border = '3px solid';
    })
@@ -32,11 +31,17 @@ const DOM = (function() {
         button.style.border = 'none';
    })
 
+   const removeElement = (function (buttonId) {
+       let button = document.getElementById(buttonId);
+       button.innerText = '';
+   })
+
    return {
        resetBoard,
        placeElement,
        highlightButton,
-       removeHighlight
+       removeHighlight,
+       removeElement,
    }
 }());
 
@@ -65,14 +70,41 @@ const gameBoard = (function () {
             board[row][col] = element;
             let gameStatus = _checkGameOver();
             Object.assign(gameStatus, {legal : true});
-            DOM.placeElement(element, position) //TODO in the dom module, where the position is just going to be the id of the block where we will be placing
-                                                  //the element
+            if (gameStatus['win'] == true){
+                Object.assign(gameStatus, {winner : element});
+            }
+            DOM.placeElement(element, position)
             return gameStatus;
         };
-        let gameStatus = _checkGameOver();
-        Object.assign(gameStatus, {legal : false});
-        return gameStatus;
+        //let gameStatus = _checkGameOver();
+        //Object.assign(gameStatus, {legal : false});
+        return {legal : false};
     };
+
+    const placeForAI = function (element, position){
+        let row = Number(position[1]);
+        let col = Number(position[2]);
+        //console.log(`row is ${row} and col is ${col} isEmpty check output is ${_isEmpty(row,col)}`);
+        if (_isEmpty(row, col)){
+            board[row][col] = element;
+            let gameStatus = _checkGameOver();
+            Object.assign(gameStatus, {legal : true});
+            if (gameStatus['win'] == true){
+                Object.assign(gameStatus, {winner : element});
+            }
+            return gameStatus;
+        };
+        //let gameStatus = _checkGameOver();
+        //Object.assign(gameStatus, {legal : false});
+        return {legal : false};
+    }
+
+    const removeElement = function(position){
+        let row = Number(position[1]);
+        let col = Number(position[2]);
+        board[row][col] = null;
+        //DOM.removeElement(position);
+    }
 
     const _isEmpty = function(row, col){
         if (board[row][col] === null){
@@ -154,7 +186,7 @@ const gameBoard = (function () {
                 let col = board[row].length - row -1;//cuz 0 index and board[row].length will give us 3, but we need 2
                 let prevRow = row-1;
                 let prevCol = board[row].length - prevRow -1
-                if (board[row][col] != board[prevRow][prevCol] || board[row][row] == null){
+                if (board[row][col] != board[prevRow][prevCol] || board[row][col] == null){
                     same = false;
                     break;
                 }
@@ -164,6 +196,8 @@ const gameBoard = (function () {
             }
             return same; //no need to check for same == true, cuz regardless we have to send the output now
         });
+
+        
         
         return _checkCols() || _checkRows() || _checkDiag();
     };
@@ -190,38 +224,48 @@ const gameBoard = (function () {
         return board;
     }
 
+    // place('X', 'b00');
+    // place('X', 'b01');
+    // place('O', 'b11');
+    // place('O', 'b02');
+//    place('X', 'b10');
+//    place('X', 'b12');
+
 
     return {
         place,
         reset,
         getBoardState,
+        removeElement,
+        placeForAI,
     };    
 }())
 
 const player = (function (sign, isHuman) {
-    
+    //if ai is O, then isMaximizing will be false
+    //if ai is X, then isMaximizing will be true    
     const insert = function (position) {
-        let legal = false;
         if (isHuman) {
             let gameState = gameBoard.place(sign, position);
-            legal = gameState['legal'];
             return gameState;        
         }
         else {
-            //position = AI.getAIPosition()//TODO
-            position = AI.genRandomMove();
+            position = AI.getBestMove()
             let gameState = gameBoard.place(sign, position);
-            if (gameState['legal'] == true){
-                return gameState;
-            }
-            else {
-                while (gameState['legal'] != true){
-                    position = AI.genRandomMove();
-                    gameState = gameBoard.place(sign, position);
-                    console.log('in while')
-                };
-                return gameState;
-            }
+            return gameState;
+            // position = AI.genRandomMove();
+            // let gameState = gameBoard.place(sign, position);
+            // if (gameState['legal'] == true){
+            //     return gameState;
+            // }
+            // else {
+            //     while (gameState['legal'] != true){
+            //         position = AI.genRandomMove();
+            //         gameState = gameBoard.place(sign, position);
+            //         console.log('in while')
+            //     };
+            //     return gameState;
+            // }
         }
     }
 
@@ -229,15 +273,104 @@ const player = (function (sign, isHuman) {
         return sign;
     }
 
-    const AI = (function(gameState){
+    const AI = (function(){
        const genRandomMove = function () {
            let col = Math.floor(Math.random()*3);
            let row = Math.floor(Math.random()*3);
            return 'b'+String(row)+String(col);
+       };
+
+       const signPoints = {
+           //the player who is X will try to maximize the points and the player who is O will try to minimize the points
+           X : 10,
+           O : -10,
+           Draw : 0
        }
+
+       const getBestMove = (function () {
+           let move;
+           let isMax = false || (sign == 'X'); //X will maximize and O will minimize
+           let bestScore;
+
+           if(isMax == false){
+               bestScore = Infinity
+           }
+           else {
+               bestScore = -Infinity;
+           }
+
+           for (i = 0; i < 3; i++){
+               for (j = 0; j<3; j++){
+                   let position = 'b'+i+j;
+                   let gameState = gameBoard.placeForAI(sign, position);
+                   if (gameState['legal'] == true){
+                       let score = miniMax(0, !isMax, gameState); //not isMax cuz if AI is X, then it has already made the first move, so the next move will be of
+                                                                  //the minimizing player. And Vice-versa
+                       console.log(`score for i : ${i} j : ${j} is ${score}`);
+                       console.log('-----')
+                       gameBoard.removeElement(position);
+                       if (isMax == false && score < bestScore){
+                            bestScore = score;
+                            move = {i,j};
+                       }
+                       else if (isMax == true && score > bestScore){
+                           bestScore = score;
+                           move = {i,j}
+                       }
+                   }
+               }
+           }
+           return 'b'+move.i+move.j;
+       })
+
+       const miniMax = function (depth, isMax, gameState){
+           if (gameState['win'] == true){
+               return signPoints[gameState.winner];
+           }
+           else if (gameState['draw'] == true){               
+               return signPoints['Draw']
+           }
+           
+           if (isMax){
+               let bestScore = -Infinity;
+               for (let i = 0; i < 3; i++){
+                   for (let j = 0; j < 3; j++){
+                       let position = 'b'+i+j;
+                       let gameState = gameBoard.placeForAI('X', position); //only X will be maximizing
+                       if (gameState['legal'] == true){
+                           let score = miniMax(depth+1, false, gameState);
+                           //console.log(`for ${i}${j} score is ${score}`);                           
+                           gameBoard.removeElement(position);
+                           bestScore = Math.max(score, bestScore);
+                       }                     
+                   }
+               }
+               return bestScore;
+           }
+
+           else {
+               let bestScore = Infinity;
+               for (let i = 0; i < 3; i++){
+                   for (let j = 0; j < 3; j++){
+                       let position = 'b'+i+j;
+                       let gameState = gameBoard.placeForAI('O', position);
+                       if (gameState['legal'] == true){
+                           let score = miniMax(depth+1, true, gameState);
+                        //    console.log(`isMin score is ${score} for move ${i} ${j}`);
+                           gameBoard.removeElement(position);
+                           bestScore = Math.min(score, bestScore);
+                       }                       
+                   }
+               }
+               return bestScore;
+           }
+       }
+
+        
 
        return {
            genRandomMove,
+           getBestMove,
        }
     })();
 
@@ -266,7 +399,7 @@ const game = (function () {
             else if (button.id == 'buttonO'){
                 humanPlayer = player('O', true);
                 aiPlayer = player('X', false);
-                gameBoard.reset(); //reset the board after every change
+                gameBoard.reset(); //reset the board after every change 
                 DOM.highlightButton(button.id) 
                 DOM.removeHighlight('buttonX')
                 aiPlayer.insert(); //first chance is the AI's if AI is X, so inserting AI's choice first
@@ -278,19 +411,22 @@ const game = (function () {
         block.addEventListener('click', () => {
             let gameState = humanPlayer.insert(block.id);
             if (gameState['legal'] == true){ //only let the AI move once the human makes a legal game move
-                let gameOver = checkGameOver('humanPlayer', gameState);
+                let gameOver = checkGameOver(gameState);
                 if (!gameOver){
                     gameState = aiPlayer.insert(); 
-                    gameOver = checkGameOver('AI', gameState);
+                    gameOver = checkGameOver(gameState);
+                    if (gameOver && aiPlayer.getSign() == 'X'){
+                        aiPlayer.insert();
+                    }
                 };                
             }
             
         })
    })
 
-    const checkGameOver = function (user, gameState){
+    const checkGameOver = function (gameState){
         if (gameState['win'] == true){
-            alert(user + ' has won');
+            alert(gameState['winner'] + ' has won');
             gameBoard.reset();
             return true;
         };
@@ -302,4 +438,5 @@ const game = (function () {
         return false;
    }
 }())
+
 
